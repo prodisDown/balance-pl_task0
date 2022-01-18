@@ -1,0 +1,7 @@
+---
+- name: Testdrive playbook with VMs
+  hosts: VM
+
+  tasks:
+  - name: ping
+    ansible.builtin.ping:
