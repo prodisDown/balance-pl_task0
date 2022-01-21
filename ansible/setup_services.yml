@@ -8,6 +8,10 @@
     - name: 'rabbitmq-server'
       url: 'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.13/rabbitmq-server-3.9.13-1.el7.noarch.rpm'
 
+    some_deps_to_install:
+    - name: 'socat'     # rabbitmq-server
+    - name: 'logrotate' # rabbitmq-server
+
   tasks:
   - name: Create working directory
     ansible.builtin.file:
@@ -26,6 +30,13 @@
       url: "{{ item['url'] }}"
       dest: "{{ my_cwd.path }}/{{ item['name'] }}.rpm"
     loop: "{{ some_rpms_to_install }}"
+
+  - name: Install deps from CentOS repo
+    become: yes
+    ansible.builtin.yum:
+      name: "{{ item['name'] }}"
+      state: present
+    loop: "{{ some_deps_to_install }}"
 
   - name: Install erlang.rpm
     become: yes
