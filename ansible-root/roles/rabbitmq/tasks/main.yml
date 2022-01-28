@@ -1,0 +1,9 @@
+---
+- name: Create working directory
+  ansible.builtin.file:
+    path: "/tmp/my_ansible_cwd"
+    state: directory
+  register: _my_cwd
+
+- name: PACKAGES-INSTALL |
+  include_tasks: packages-install.yml
