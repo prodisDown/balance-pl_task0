@@ -1,0 +1,20 @@
+---
+my_cwd:
+  path: "/tmp/my_ansible_cwd/"
+
+systemd_units:
+  system:
+    path: '/etc/systemd/system/'
+  user:
+    path: '/etc/systemd/user/'
+  global:
+    path: '/etc/systemd/user/'
+
+
+# PACKAGES
+
+node_exporter:
+  install_pref: '/opt/node_exporter-1.3.1.linux-amd64'
+  exec: '/opt/node_exporter-1.3.1.linux-amd64/node_exporter'
+  service:
+    ExecStart: '/opt/node_exporter-1.3.1.linux-amd64/node_exporter'

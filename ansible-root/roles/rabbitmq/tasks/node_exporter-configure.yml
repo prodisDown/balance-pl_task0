@@ -1,0 +1,39 @@
+---
+- block:
+  - name: NODE_EXPORTER-CONFIGURE | Template node_exporter.service to tmp location
+    become: yes
+    ansible.builtin.template:
+      src: "node_exporter.service.j2"
+      dest: "{{ systemd_units.system.path }}/node_exporter.service"
+      backup: yes
+    register: _template
+
+  - name: NODE_EXPORTER-CONFIGURE | Verify node_exporter.service file
+    become: yes
+    ansible.builtin.command:
+      argv:
+      - '/bin/systemd-analyze'
+      - 'verify'
+      - "{{ systemd_units.system.path }}/node_exporter.service"
+    when: _template.changed is true
+
+  rescue:
+  - name: NODE_EXPORTER-CONFIGURE | Restore file from backup
+    become: yes
+    ansible.builtin.copy:
+      remote_src: yes
+      dest: "{{ systemd_units.system.path }}/node_exporter.service"
+      src: "{{ _template.backup_file }}"
+  - name: NODE_EXPORTER-CONFIGURE | Fail anyway
+    ansible.builtin.fail: "{{ ansible_failed_task }}: {{ ansible_failed_result }}"
+
+
+
+
+- name: NODE_EXPORTER-CONFIGURE | Enable node_exporter.service
+  become: yes
+  ansible.builtin.systemd:
+    service: 'node_exporter.service'
+    enabled: yes
+    scope: system
+    state: started

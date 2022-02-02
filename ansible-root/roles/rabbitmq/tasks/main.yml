@@ -1,9 +1,26 @@
 ---
 - name: Create working directory
   ansible.builtin.file:
-    path: "/tmp/my_ansible_cwd"
+    path: "{{ my_cwd.path }}"
     state: directory
-  register: _my_cwd
 
-- name: PACKAGES-INSTALL |
+- name: Directories for systemd services
+  become: yes
+  ansible.builtin.file:
+    owner: root
+    group: root
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ systemd_units.system.path }}"
+  - "{{ systemd_units.user.path }}"
+  - "{{ systemd_units.global.path }}"
+
+- name: PACKAGES-INSTALL
   include_tasks: packages-install.yml
+
+- name: RABBITMQ-CONFIGURE
+  include_tasks: rabbitmq-configure.yml
+
+- name: NODE_EXPORTER-CONFIGURE
+  include_tasks: node_exporter-configure.yml

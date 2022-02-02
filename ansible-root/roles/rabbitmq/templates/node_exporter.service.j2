@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=node_exporter
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart={{ node_exporter.service.ExecStart }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
