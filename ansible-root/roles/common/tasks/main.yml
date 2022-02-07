@@ -1,0 +1,12 @@
+---
+- name: Install Extra Packages for Enterprise Linux (epel) repository
+  become: yes
+  ansible.builtin.yum:
+    pkg: "epel-release"
+    state: latest
+
+- name: Install good terminal
+  become: yes
+  ansible.builtin.yum:
+    pkg: "rxvt-unicode"
+    state: latest

@@ -1,4 +1,9 @@
 ---
+- name: Setup VMs
+  hosts: VM
+  roles:
+  - common
+
 - name: Setup RabbitMQ and node_exporter
   hosts: rabbitmq
   roles:

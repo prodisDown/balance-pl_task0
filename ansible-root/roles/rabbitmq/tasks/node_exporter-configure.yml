@@ -17,6 +17,13 @@
       - "{{ systemd_units.system.path }}/node_exporter.service"
     when: _template.changed is true
 
+  - name: NODE_EXPORTER-CONFIGURE | Remove backup file
+    become: yes
+    ansible.builtin.file:
+      path: "{{ _template.backup_file }}"
+      state: absent
+    when: _template.changed is true and _template.backup_file is defined
+
   rescue:
   - name: NODE_EXPORTER-CONFIGURE | Restore file from backup
     become: yes
@@ -24,11 +31,11 @@
       remote_src: yes
       dest: "{{ systemd_units.system.path }}/node_exporter.service"
       src: "{{ _template.backup_file }}"
+    when: _template.backup_file is defined
+
   - name: NODE_EXPORTER-CONFIGURE | Fail anyway
-    ansible.builtin.fail: "{{ ansible_failed_task }}: {{ ansible_failed_result }}"
-
-
-
+    ansible.builtin.fail:
+      msg: "{{ ansible_failed_task }}: {{ ansible_failed_result }}"
 
 - name: NODE_EXPORTER-CONFIGURE | Enable node_exporter.service
   become: yes
