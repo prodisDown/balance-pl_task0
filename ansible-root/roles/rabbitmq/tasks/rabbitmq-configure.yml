@@ -16,3 +16,29 @@
   loop:
   - rabbitmq_management
   - rabbitmq_prometheus
+
+- name: RABBITMQ_CONFIGURE | Delete default 'guest' user
+  become: yes
+  community.rabbitmq.rabbitmq_user:
+    user: guest
+    state: absent
+
+- name: RABBITMQ_CONFIGURE | Add vhosts
+  become: yes
+  community.rabbitmq.rabbitmq_vhost:
+    vhost: "{{ item.vhost }}"
+    state: "{{ item.state | default(omit) }}"
+    node: "{{ item.node | default(omit) }}"
+    tracing: "{{ item.tracing | default(omit) }}"
+  loop: "{{ rabbitmq.definition.vhosts }}"
+
+- name: RABBITMQ_CONFIGURE | Add 'admin' and over users
+  become: yes
+  community.rabbitmq.rabbitmq_user:
+    user: "{{ item.user }}"
+    force: "{{ item.force | default(omit) }}"
+    tags: "{{ item.tags | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+    update_password: "{{ item.force | default(omit) }}"
+    permissions: "{{ item.permissions | default(omit) }}"
+  loop: "{{ rabbitmq.definition.users }}"
