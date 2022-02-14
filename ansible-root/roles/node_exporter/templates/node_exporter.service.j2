@@ -6,7 +6,7 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
-ExecStart={{ node_exporter.service.ExecStart }}
+ExecStart={{ node_exporter_service.ExecStart }}
 Restart=always
 
 [Install]

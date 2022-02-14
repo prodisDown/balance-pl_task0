@@ -30,9 +30,9 @@
     state: "{{ item.state | default(omit) }}"
     node: "{{ item.node | default(omit) }}"
     tracing: "{{ item.tracing | default(omit) }}"
-  loop: "{{ rabbitmq.definition.vhosts }}"
+  loop: "{{ rabbitmq_definition_vhosts }}"
 
-- name: RABBITMQ_CONFIGURE | Add 'admin' and over users
+- name: RABBITMQ_CONFIGURE | Add 'admin' and 'monitoring' users
   become: yes
   community.rabbitmq.rabbitmq_user:
     user: "{{ item.user }}"
@@ -41,4 +41,4 @@
     password: "{{ item.password | default(omit) }}"
     update_password: "{{ item.force | default(omit) }}"
     permissions: "{{ item.permissions | default(omit) }}"
-  loop: "{{ rabbitmq.definition.users }}"
+  loop: "{{ rabbitmq_definition_commonUsers }}"

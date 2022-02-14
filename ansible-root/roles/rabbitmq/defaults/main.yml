@@ -1,0 +1,38 @@
+---
+my_cwd:
+  path: "/tmp/my_ansible_cwd/"
+
+systemd_units:
+  system:
+    path: '/etc/systemd/system/'
+  user:
+    path: '/etc/systemd/user/'
+  global:
+    path: '/etc/systemd/user/'
+
+
+#rabbitmq_definition_vhosts:
+#- vhost: /
+#- vhost: testvh
+
+#rabbitmq_definition_commonUsers:
+#- user: admin
+#  password: admin
+#  tags: administrator
+#  permissions:
+#  - vhost: /
+#    configure_priv: .*
+#    read_priv: .*
+#    write_priv: .*
+#  - vhost: testvh
+#    configure_priv: .*
+#    read_priv: .*
+#    write_priv: .*
+#- user: monitoring
+#  password: monitoring
+#  tags: monitoring
+#  permissions:
+#  - vhost: testvh
+#    configure_priv: ^$
+#    read_priv: .*
+#    write_priv: ^$

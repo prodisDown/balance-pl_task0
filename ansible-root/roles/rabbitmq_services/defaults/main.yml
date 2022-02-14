@@ -1,0 +1,9 @@
+---
+#rabbitmq_definition_serviceUsers:
+#- user: service_x
+#  password: service_x
+#  permissions:
+#  - vhost: testvh
+#    configure_priv: .*
+#    read_priv: .*
+#    write_priv: .*

@@ -1,0 +1,11 @@
+---
+- name: RABBITMQ_CONFIGURE | Add service users
+  become: yes
+  community.rabbitmq.rabbitmq_user:
+    user: "{{ item.user }}"
+    force: "{{ item.force | default(omit) }}"
+    tags: "{{ item.tags | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+    update_password: "{{ item.force | default(omit) }}"
+    permissions: "{{ item.permissions | default(omit) }}"
+  loop: "{{ rabbitmq_definition_serviceUsers }}"

@@ -1,0 +1,3 @@
+---
+- name: RABBITMQ-CONFIGURE
+  import_tasks: rabbitmq-configure.yml

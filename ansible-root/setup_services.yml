@@ -6,5 +6,44 @@
 
 - name: Setup RabbitMQ and node_exporter
   hosts: rabbitmq
+  vars:
+    pb_rabbitmq_definition_vhosts:
+    - vhost: /
+    - vhost: testvh
+    pb_rabbitmq_definition_commonUsers:
+    - user: admin
+      password: admin
+      tags: administrator
+      permissions:
+      - vhost: /
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+      - vhost: testvh
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+    - user: monitoring
+      password: monitoring
+      tags: monitoring
+      permissions:
+      - vhost: testvh
+        configure_priv: ^$
+        read_priv: .*
+        write_priv: ^$
   roles:
-  - rabbitmq
+  - role: rabbitmq
+    vars:
+      rabbitmq_definition_vhosts: "{{ pb_rabbitmq_definition_vhosts }}"
+      rabbitmq_definition_commonUsers: "{{ pb_rabbitmq_definition_commonUsers }}"
+  - role: rabbitmq_services
+    vars:
+      rabbitmq_definition_serviceUsers:
+      - user: service_x
+        password: service_x
+        permissions:
+        - vhost: testvh
+          configure_priv: .*
+          read_priv: .*
+          write_priv: .*
+  - node_exporter
