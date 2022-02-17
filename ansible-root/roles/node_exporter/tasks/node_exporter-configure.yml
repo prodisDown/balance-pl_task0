@@ -40,6 +40,7 @@
 - name: NODE_EXPORTER-CONFIGURE | Enable node_exporter.service
   become: yes
   ansible.builtin.systemd:
+    daemon_reload: yes
     service: 'node_exporter.service'
     enabled: yes
     scope: system

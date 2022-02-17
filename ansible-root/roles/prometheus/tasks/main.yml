@@ -1,0 +1,23 @@
+---
+- name: Create working directory
+  ansible.builtin.file:
+    path: "{{ my_cwd.path }}"
+    state: directory
+
+- name: Directories for systemd services
+  become: yes
+  ansible.builtin.file:
+    owner: root
+    group: root
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ systemd_units.system.path }}"
+  - "{{ systemd_units.user.path }}"
+  - "{{ systemd_units.global.path }}"
+
+- name: PACKAGES-INSTALL
+  import_tasks: packages-install.yml
+
+- name: PROMETHEUS-CONFIGURE
+  import_tasks: prometheus-configure.yml

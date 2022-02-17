@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+global: # basically defaults to all jobs
+  {{ prometheus_globals }}
+
+scrape_configs:
+  {{ prometheus_scrape }}

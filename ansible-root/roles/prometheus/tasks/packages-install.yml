@@ -1,0 +1,11 @@
+---
+- name: PACKAGES-INSTALL | Install prometheus to /opt/
+  become: true
+  ansible.builtin.unarchive:
+    remote_src: true
+    list_files: true
+    owner: root
+    group: root
+    src: "{{ prometheus_pkg.src }}"
+    dest: "{{ prometheus_pkg.install_pref | dirname }}"
+    creates: "{{ prometheus_pkg.install_pref }}"

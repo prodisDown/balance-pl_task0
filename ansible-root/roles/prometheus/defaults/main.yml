@@ -1,0 +1,35 @@
+---
+my_cwd:
+  path: "/tmp/my_ansible_cwd/"
+
+systemd_units:
+  system:
+    path: '/etc/systemd/system/'
+  user:
+    path: '/etc/systemd/user/'
+  global:
+    path: '/etc/systemd/user/'
+
+
+prometheus_pkg:
+  src: 'https://github.com/prometheus/prometheus/releases/download/v2.33.3/prometheus-2.33.3.linux-amd64.tar.gz'
+  install_pref: '/opt/prometheus-2.33.3.linux-amd64'
+  exec: '/opt/prometheus-2.33.3.linux-amd64/prometheus'
+
+prometheus_service:
+  ExecStart: '/opt/prometheus-2.33.3.linux-amd64/prometheus'
+
+
+prometheus_config_path: '/opt/prometheus-2.33.3.linux-amd64/prometheus.yml'
+
+prometheus_globals:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+  scrape_timeout: 10s
+
+prometheus_scrape:
+  - job_name: "prometheus"
+    metrics_path: '/metrics'
+    scheme: 'http'
+    static_configs:
+      - targets: ['localhost:9090']

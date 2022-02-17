@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Prometheus
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart={{ prometheus_service.ExecStart }} --config.file={{ prometheus_config_path }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
