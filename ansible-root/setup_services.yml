@@ -60,3 +60,9 @@
           - job_name: "rabbitmq"
             static_configs:
               - targets: "[{% for h in (groups.rabbitmq) | unique %}'{{ hostvars[h].ansible_host }}:15692',{% endfor %}]"
+          - job_name: "node_exporter"
+            metrics_path: '/metrics'
+            scheme: 'http'
+            static_configs:
+              - targets: "[{% for h in groups.rabbitmq %}'{{ hostvars[h].ansible_host }}:9100',{% endfor %}]"
+    - role: grafana

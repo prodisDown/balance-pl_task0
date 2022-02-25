@@ -1,0 +1,24 @@
+---
+# https://dl.grafana.com/oss/release/grafana-8.4.0.linux-amd64.tar.gz
+- name: PACKAGES-INSTALL | Install Grafana to /opt/
+  become: true
+  ansible.builtin.unarchive:
+    remote_src: true
+    list_files: true
+    owner: root
+    group: root
+    src: "{{ grafana_pkg.src }}"
+    dest: "{{ grafana_pkg.install_pref | dirname }}"
+    creates: "{{ grafana_pkg.install_pref }}"
+
+- name: GRAFANA-CONFIGURE | Create all necessary directories
+  become: yes
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+  loop:
+    - "{{ grafana_conf_dir }}/provisioning"
+    - "{{ grafana_data_dir }}/log"
+    - "{{ grafana_data_dir }}/plugins"

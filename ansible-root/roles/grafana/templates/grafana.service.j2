@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Grafana
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart={{ grafana_service.ExecStart }} -homepath {{ grafana_homepath_dir }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

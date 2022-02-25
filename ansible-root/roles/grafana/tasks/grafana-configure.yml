@@ -1,23 +1,25 @@
 ---
+# SYSTEMD SERVICE TEMPLATE
+
 - block:
-    - name: PROMETHEUS-CONFIGURE | Template prometheus.service to tmp location
+    - name: GRAFANA-CONFIGURE | Template grafana.service to tmp location
       become: yes
       ansible.builtin.template:
-        src: "prometheus.service.j2"
-        dest: "{{ systemd_units.system.path }}/prometheus.service"
+        src: "grafana.service.j2"
+        dest: "{{ systemd_units.system.path }}/grafana.service"
         backup: yes
       register: _service_template
 
-    - name: PROMETHEUS-CONFIGURE | Verify prometheus.service file
+    - name: GRAFANA-CONFIGURE | Verify grafana.service file
       become: yes
       ansible.builtin.command:
         argv:
           - '/bin/systemd-analyze'
           - 'verify'
-          - "{{ systemd_units.system.path }}/prometheus.service"
+          - "{{ systemd_units.system.path }}/grafana.service"
       when: _service_template.changed is true
 
-    - name: PROMETHEUS-CONFIGURE | Remove backup file
+    - name: GRAFANA-CONFIGURE | Remove backup file
       become: yes
       ansible.builtin.file:
         path: "{{ _service_template.backup_file }}"
@@ -25,46 +27,37 @@
       when: _service_template.backup_file is defined
 
   rescue:
-    - name: PROMETHEUS-CONFIGURE | Restore file from backup
+    - name: GRAFANA-CONFIGURE | Restore file from backup
       become: yes
       ansible.builtin.copy:
         remote_src: yes
-        dest: "{{ systemd_units.system.path }}/prometheus.service"
+        dest: "{{ systemd_units.system.path }}/grafana.service"
         src: "{{ _service_template.backup_file }}"
       when: _service_template.backup_file is defined
 
-    - name: PROMETHEUS-CONFIGURE | Remove backup file
+    - name: GRAFANA-CONFIGURE | Remove backup file
       become: yes
       ansible.builtin.file:
         path: "{{ _service_template.backup_file }}"
         state: absent
       when: _service_template.backup_file is defined
 
-    - name: PROMETHEUS-CONFIGURE | Fail anyway
+    - name: GRAFANA-CONFIGURE | Fail anyway
       ansible.builtin.fail:
         msg: "{{ ansible_failed_task }}: {{ ansible_failed_result }}"
 
+# CONFIG TEMPLATE
+
 - block:
-    - name: PROMETHEUS-CONFIGURE | Template prometheus.yml config to tmp location
+    - name: GRAFANA-CONFIGURE | Template defaults.ini config to tmp location
       become: yes
       ansible.builtin.template:
-        src: "prometheus.yml.j2"
-        dest: "{{ prometheus_config_path }}"
+        src: "defaults.ini.j2"
+        dest: "{{ grafana_conf_dir }}/defaults.ini"
         backup: yes
       register: _config_template
 
-
-    - name: PROMETHEUS-CONFIGURE | Verify prometheus.yml config
-      become: yes
-      ansible.builtin.command:
-        argv:
-          - "{{ prometheus_pkg.install_pref }}/promtool"
-          - 'check'
-          - 'config'
-          - "{{ prometheus_config_path }}"
-      when: _config_template.changed is true
-
-    - name: PROMETHEUS-CONFIGURE | Remove backup file
+    - name: GRAFANA-CONFIGURE | Remove backup file
       become: yes
       ansible.builtin.file:
         path: "{{ _config_template.backup_file }}"
@@ -72,54 +65,75 @@
       when: _config_template.backup_file is defined
 
   rescue:
-    - name: PROMETHEUS-CONFIGURE | Restore file from backup
+    - name: GRAFANA-CONFIGURE | Restore file from backup
       become: yes
       ansible.builtin.copy:
         remote_src: yes
-        dest: "{{ prometheus_config_path }}"
+        dest: "{{ grafana_conf_dir }}/defaults.ini"
         src: "{{ _config_template.backup_file }}"
       when: _config_template.backup_file is defined
 
-    - name: PROMETHEUS-CONFIGURE | Remove backup file
+    - name: GRAFANA-CONFIGURE | Remove backup file
       become: yes
       ansible.builtin.file:
         path: "{{ _config_template.backup_file }}"
         state: absent
       when: _config_template.backup_file is defined
 
-    - name: PROMETHEUS-CONFIGURE | Fail anyway
+    - name: GRAFANA-CONFIGURE | Fail anyway
       ansible.builtin.fail:
         msg: "{{ ansible_failed_task }}: {{ ansible_failed_result }}"
 
-- name: PROMETHEUS-CONFIGURE | Enable prometheus.service
+# DASHBOARD TEMPLATE
+
+#- name: GRAFANA-CONFIGURE | Template dashboards
+#  become: yes
+#  ansible.builtin.template:
+#    src: "dashboard.yaml.j2"
+#    dest: "{{ grafana_conf_dir }}/provisioning/dashboards/dashboard.yaml"
+#  register: _dashboards_template
+
+# PLUGINS TEMPLATE
+
+#- name: GRAFANA-CONFIGURE | Template plugins
+#  become: yes
+#  ansible.builtin.template:
+#    src: "plugins.yaml.j2"
+#    dest: "{{ grafana_conf_dir }}/provisioning/plugins/plugin.yaml"
+#  register: _plugins_template
+
+# LAUNCH/REBOOT SERVICE
+
+- name: GRAFANA-CONFIGURE | Enable grafana.service
   become: yes
   ansible.builtin.systemd:
     daemon_reload: yes
-    service: 'prometheus.service'
+    service: 'grafana.service'
     enabled: yes
     scope: system
     state: started
   register: _service_run
 
-- name: PROMETHEUS-CONFIGURE | Get prometheus config file stats
+- name: GRAFANA-CONFIGURE | Get grafana config file stats
   become: yes
   ansible.builtin.stat:
     mime: no
     attr: no
     get_checksum: no
-    path: "{{ prometheus_config_path }}"
-  register: _config_stat
+    path: "{{ grafana_conf_dir }}/defaults.ini"
 
-- name: PROMETHEUS-CONFIGURE | Restart prometheus if its config was changed
+- name: GRAFANA-CONFIGURE | Restart grafana if its config was changed
   become: yes
   ansible.builtin.systemd:
-    service: 'prometheus.service'
+    service: 'grafana.service'
     state: restarted
   when: >
     (
       (_config_template.changed is true)
-      and
-      (_service_run.changed is false)
+#     or
+#     (_dashboards_template.changed is true)
+#     or
+#     (_plugins_template.changed is true)
     )
-    or
-    (_config_stat.stat.mtime > (_service_run.status.ExecMainStartTimestamp|to_datetime('%a %Y-%m-%d %H:%M:%S %Z')).timestamp())
+    and
+    (_service_run.changed is false)
