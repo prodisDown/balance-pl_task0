@@ -130,10 +130,6 @@
   when: >
     (
       (_config_template.changed is true)
-#     or
-#     (_dashboards_template.changed is true)
-#     or
-#     (_plugins_template.changed is true)
     )
     and
     (_service_run.changed is false)
