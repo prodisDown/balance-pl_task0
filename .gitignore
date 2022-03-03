@@ -1,2 +1,3 @@
+misc/
 ansible-root/ssh-keys/
 ansible-root/my_hosts.ini
